@@ -1,0 +1,114 @@
+/* Import Google Font */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Roboto', sans-serif;
+}
+
+/* Background */
+body {
+    background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
+                url('https://www.99acres.com/microsite/articles/files/2022/09/land-parcel.jpg') no-repeat center center fixed;
+    background-size: cover;
+    color: #fff;
+    padding: 30px;
+}
+
+/* Container */
+.cx {
+    max-width: 900px;
+    margin: auto;
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0, 235, 12, 0.5);
+}
+
+/* Header */
+#Head h1 {
+    text-align: center;
+    font-size: 28px;
+    margin-bottom: 40px;
+    color: #ffdd57;
+}
+
+/* Form Section */
+.form_control {
+    margin-bottom: 50px;
+    padding: 20px;
+    background-color: rgba(73, 168, 60, 0.4);
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(255, 255, 255, 0.1);
+}
+
+.form_control h2 {
+    font-size: 22px;
+    margin-bottom: 20px;
+    color: #ffd700;
+}
+
+/* Labels and Inputs */
+label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: bold;
+    color: #ffffff;
+}
+
+input[type="text"],
+input[type="date"] {
+    width: 100%;
+    padding: 10px 15px;
+    margin-bottom: 20px;
+    border: none;
+    border-radius: 8px;
+    background-color: #f0f0f0;
+    color: #333;
+    font-size: 15px;
+}
+
+input[type="text"]:focus,
+input[type="date"]:focus {
+    outline: none;
+    border: 2px solid #ffdd57;
+    background-color: #fff;
+}
+
+/* Button */
+.button {
+    text-align: right;
+}
+
+.button button {
+    padding: 10px 20px;
+    background-color: #ffdd57;
+    color: #333;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.button button:hover {
+    background-color: #ffe88b;
+    transform: scale(1.05);
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .form_control h2 {
+        font-size: 18px;
+    }
+
+    #Head h1 {
+        font-size: 22px;
+    }
+
+    .button {
+        text-align: center;
+    }
+}
