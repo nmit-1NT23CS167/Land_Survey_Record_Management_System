@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Search Results</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ccc;
+        }
+        th {
+            background: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Search Results</h1>
+    <% if (records.length > 0) { %>
+        <table>
+            <tr>
+                <th>Plot Number</th>
+                <th>Owner Name</th>
+                <th>Area</th>
+                <th>Latitude</th>
+                <th>Longitude</th>
+                <th>State</th>
+                <th>Country</th>
+                <th>Date</th>
+            </tr>
+            <% records.forEach(function(record) { %>
+                <tr>
+                    <td><%= record.plot_number %></td>
+                    <td><%= record.owner_name %></td>
+                    <td><%= record.area %></td>
+                    <td><%= record.lat %></td>
+                    <td><%= record.lng %></td>
+                    <td><%= record.state %></td>
+                    <td><%= record.country %></td>
+                    <td><%= record.date %></td>
+                </tr>
+            <% }); %>
+        </table>
+    <% } else { %>
+        <p>No records found.</p>
+    <% } %>
+
+    <br>
+    <a href="/">← Back to Search</a>
+</body>
+</html>
