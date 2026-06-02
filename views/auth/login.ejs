@@ -1,0 +1,52 @@
+<%- include('../partials/header') %>
+
+<div class="auth-wrapper">
+  <div class="auth-left">
+    <div class="auth-overlay">
+      <div class="auth-brand">
+        <i class="bi bi-map-fill"></i>
+        <h1>LandSurveyPro</h1>
+        <p>Intelligent Land Survey Record Management System</p>
+      </div>
+      <div class="auth-features">
+        <div class="feature-item"><i class="bi bi-shield-check"></i> Secure role-based access</div>
+        <div class="feature-item"><i class="bi bi-geo-alt-fill"></i> Interactive map visualization</div>
+        <div class="feature-item"><i class="bi bi-file-earmark-pdf"></i> PDF export capability</div>
+        <div class="feature-item"><i class="bi bi-clock-history"></i> Complete audit trail</div>
+      </div>
+    </div>
+  </div>
+  <div class="auth-right">
+    <div class="auth-card">
+      <h2 class="auth-title">Sign In</h2>
+      <p class="auth-sub">Access your land survey dashboard</p>
+
+      <form action="/login" method="POST" novalidate>
+        <div class="mb-4">
+          <label class="form-label">Email Address</label>
+          <div class="input-group-custom">
+            <i class="bi bi-envelope"></i>
+            <input type="email" name="email" class="form-control fc-custom" placeholder="officer@survey.gov.in" required />
+          </div>
+        </div>
+        <div class="mb-4">
+          <label class="form-label">Password</label>
+          <div class="input-group-custom">
+            <i class="bi bi-lock"></i>
+            <input type="password" name="password" class="form-control fc-custom" placeholder="Enter your password" required />
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary w-100 btn-lsm">
+          <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
+        </button>
+      </form>
+
+      <div class="auth-divider"><span>New to the system?</span></div>
+      <a href="/register" class="btn btn-outline-secondary w-100 btn-lsm-outline">
+        Create Account
+      </a>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

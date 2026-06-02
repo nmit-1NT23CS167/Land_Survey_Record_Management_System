@@ -1,0 +1,135 @@
+<%
+  extraJS = `
+<script>
+function editUser(id, role, active) {
+  document.getElementById('editForm').action = '/admin/users/' + id + '/role';
+  document.getElementById('editRole').value = role;
+  document.getElementById('editActive').value = String(active);
+  new bootstrap.Modal(document.getElementById('editModal')).show();
+}
+<\/script>`;
+%>
+<%- include('../partials/header') %>
+
+<div class="page-header">
+  <div class="container-fluid px-4">
+    <div class="d-flex justify-content-between align-items-center">
+      <div>
+        <h1 class="page-title"><i class="bi bi-people-fill"></i> User Management</h1>
+        <p class="page-sub"><%= users.length %> registered users</p>
+      </div>
+      <a href="/admin" class="btn btn-outline-light btn-lsm"><i class="bi bi-arrow-left me-1"></i> Back</a>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid px-4 py-4">
+  <div class="lsm-card">
+    <div class="lsm-card-body p-0">
+      <div class="table-responsive">
+        <table class="table lsm-table mb-0">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Department</th>
+              <th>Role</th>
+              <th>Status</th>
+              <th>Last Login</th>
+              <th>Joined</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% users.forEach(function(u) { %>
+            <tr>
+              <td><strong><%= u.full_name %></strong></td>
+              <td><small><%= u.email %></small></td>
+              <td><%= u.department || '—' %></td>
+              <td>
+                <span class="role-badge role-<%= u.role %>">
+                  <%= (u.role || '').replace('_', ' ') %>
+                </span>
+              </td>
+              <td>
+                <span class="status-pill <%= u.is_active ? 'status-active' : 'status-archived' %>">
+                  <%= u.is_active ? 'Active' : 'Inactive' %>
+                </span>
+              </td>
+              <td><small><%= u.last_login ? new Date(u.last_login).toLocaleDateString('en-IN') : 'Never' %></small></td>
+              <td><small><%= u.created_at ? new Date(u.created_at).toLocaleDateString('en-IN') : '—' %></small></td>
+              <td>
+                <div class="action-btns">
+                  <button
+                    class="btn-icon btn-icon-edit"
+                    onclick="editUser('<%= u._id %>', '<%= u.role %>', '<%= u.is_active %>')"
+                    title="Edit Role & Status">
+                    <i class="bi bi-pencil"></i>
+                  </button>
+                  <% if (u._id.toString() !== user._id.toString()) { %>
+                  <form
+                    action="/admin/users/<%= u._id %>/delete"
+                    method="POST"
+                    class="d-inline"
+                    onsubmit="return confirm('Permanently delete <%= u.full_name %>? This cannot be undone.')">
+                    <button type="submit" class="btn-icon btn-icon-del" title="Delete User">
+                      <i class="bi bi-trash3"></i>
+                    </button>
+                  </form>
+                  <% } else { %>
+                  <span class="btn-icon" style="opacity:0.3;cursor:default" title="Cannot delete your own account">
+                    <i class="bi bi-trash3"></i>
+                  </span>
+                  <% } %>
+                </div>
+              </td>
+            </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit User Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content lsm-modal">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editModalLabel">
+          <i class="bi bi-person-gear me-2"></i>Update User Access
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form id="editForm" method="POST">
+        <div class="modal-body">
+          <div class="mb-4">
+            <label class="form-label">Role</label>
+            <select name="role" id="editRole" class="form-select fc-custom">
+              <option value="user">User — read only access</option>
+              <option value="survey_officer">Survey Officer — can add and edit records</option>
+              <option value="admin">Admin — full system access</option>
+            </select>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Account Status</label>
+            <select name="is_active" id="editActive" class="form-select fc-custom">
+              <option value="true">Active — can log in</option>
+              <option value="false">Inactive — login blocked</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-success btn-lsm">
+            <i class="bi bi-save me-1"></i> Save Changes
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>
+

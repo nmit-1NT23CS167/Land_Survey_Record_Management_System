@@ -1,0 +1,139 @@
+<%
+  extraCSS = `
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+<style>
+  #fullMap { height: calc(100vh - 130px); width: 100%; }
+  .map-wrapper { position: relative; }
+</style>`;
+
+  extraJS = `
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"><\/script>
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"><\/script>
+<script>
+  const allRecords = JSON.parse(document.getElementById('mapData').textContent);
+
+  const map = L.map('fullMap').setView([20.5937, 78.9629], 5);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: 'OpenStreetMap contributors', maxZoom: 19
+  }).addTo(map);
+
+  const colorMap = {
+    agricultural:'#2d7a2d', residential:'#2563eb', commercial:'#d97706',
+    industrial:'#6b7280', forest:'#065f46', waste:'#9f1239', other:'#7c3aed'
+  };
+
+  function makeIcon(type, status) {
+    const color = colorMap[type] || '#2d7a2d';
+    const size = status === 'disputed' ? 16 : 13;
+    const ring = status === 'disputed' ? 'box-shadow:0 0 0 3px rgba(239,68,68,0.5),0 2px 8px rgba(0,0,0,0.4);' : 'box-shadow:0 2px 8px rgba(0,0,0,0.4);';
+    return L.divIcon({
+      className: '',
+      html: '<div style="background:' + color + ';width:' + size + 'px;height:' + size + 'px;border-radius:50%;border:2.5px solid #fff;' + ring + '"></div>',
+      iconSize: [size, size],
+      iconAnchor: [size / 2, size / 2]
+    });
+  }
+
+  const clusterGroup = L.markerClusterGroup({ maxClusterRadius: 50 });
+  let clusterAdded = false;
+
+  function renderMarkers(filter) {
+    clusterGroup.clearLayers();
+    allRecords.forEach(function(r) {
+      if (!Number.isFinite(r.lat) || !Number.isFinite(r.lng)) return;
+      if (filter && r.type !== filter) return;
+      const marker = L.marker([r.lat, r.lng], { icon: makeIcon(r.type, r.status) });
+      marker.on('click', function() { showPanel(r); });
+      clusterGroup.addLayer(marker);
+    });
+    if (!clusterAdded) {
+      map.addLayer(clusterGroup);
+      clusterAdded = true;
+    }
+  }
+
+  function showPanel(r) {
+    const panel = document.getElementById('mapInfoPanel');
+    const content = document.getElementById('mapInfoContent');
+    const lat = Number(r.lat);
+    const lng = Number(r.lng);
+
+    content.innerHTML =
+      '<h5 class="mb-1">' + (r.plot || 'Unnamed') + '</h5>' +
+      '<p class="mb-3 small" style="color:var(--text-muted)">' + (r.owner || 'Unknown') + '</p>' +
+      '<table class="table table-sm mb-3" style="font-size:13px">' +
+        '<tr><td><strong>Type</strong></td><td>' + (r.type || '—') + '</td></tr>' +
+        '<tr><td><strong>Area</strong></td><td>' + (r.area || '—') + '</td></tr>' +
+        '<tr><td><strong>State</strong></td><td>' + (r.state || '—') + '</td></tr>' +
+        '<tr><td><strong>Status</strong></td><td><span class="status-pill status-' + (r.status || 'unknown') + '">' + (r.status || 'Unknown') + '</span></td></tr>' +
+        '<tr><td><strong>Coords</strong></td><td>' + (Number.isFinite(lat) ? lat.toFixed(5) : 'N/A') + ', ' + (Number.isFinite(lng) ? lng.toFixed(5) : 'N/A') + '</td></tr>' +
+      '</table>' +
+      '<a href="/records/' + r.id + '" class="btn btn-sm btn-success w-100">View Full Record</a>';
+    panel.style.display = 'block';
+  }
+
+  document.getElementById('filterType').addEventListener('change', function(e) {
+    renderMarkers(e.target.value);
+  });
+
+  renderMarkers('');
+<\/script>`;
+%>
+<%- include('../partials/header') %>
+
+<div class="page-header" style="padding:12px 0">
+  <div class="container-fluid px-4">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+      <div>
+        <h1 class="page-title mb-0"><i class="bi bi-geo-alt-fill"></i> Map View</h1>
+        <p class="page-sub mb-0"><%= records.length %> plots loaded</p>
+      </div>
+      <div class="d-flex gap-2 align-items-center">
+        <select id="filterType" class="form-select fc-custom" style="width:auto;min-width:150px">
+          <option value="">All Land Types</option>
+          <% ['agricultural','residential','commercial','industrial','forest','waste','other'].forEach(function(t){ %>
+            <option value="<%= t %>"><%= t.charAt(0).toUpperCase() + t.slice(1) %></option>
+          <% }); %>
+        </select>
+        <a href="/records" class="btn btn-outline-light btn-lsm">
+          <i class="bi bi-table me-1"></i> Table View
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Pass data to JS safely via JSON script tag — avoids EJS-in-JS escaping problems -->
+<script id="mapData" type="application/json">
+  <%- JSON.stringify(records.map(function(r){
+    const lat = parseFloat(r.lat);
+    const lng = parseFloat(r.lng);
+    return Number.isFinite(lat) && Number.isFinite(lng) ? {
+      id:     r._id,
+      plot:   r.plot_number,
+      owner:  r.owner_name,
+      lat,
+      lng,
+      status: r.status,
+      type:   r.land_type,
+      area:   (r.area || '') + ' ' + (r.area_unit || ''),
+      state:  r.state || ''
+    } : null;
+  }).filter(Boolean)) %>
+</script>
+
+<div class="map-wrapper">
+  <div id="fullMap"></div>
+</div>
+
+<!-- Floating detail panel -->
+<div id="mapInfoPanel" class="map-info-panel" style="display:none">
+  <div class="map-info-close" onclick="document.getElementById('mapInfoPanel').style.display='none'">
+    <i class="bi bi-x-lg"></i>
+  </div>
+  <div id="mapInfoContent"></div>
+</div>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,216 @@
+<%
+  extraCSS = '<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />';
+  extraJS = `
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"><\/script>
+<script>
+  (function() {
+    var lat = parseFloat(document.getElementById('recLat').value) || 20.5937;
+    var lng = parseFloat(document.getElementById('recLng').value) || 78.9629;
+    var map = L.map('recordMap').setView([lat, lng], 14);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: 'OpenStreetMap contributors'
+    }).addTo(map);
+    var icon = L.divIcon({
+      className: '',
+      html: '<div style="background:#1a5c1a;width:18px;height:18px;border-radius:50%;border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,0.4)"></div>',
+      iconSize:[18,18], iconAnchor:[9,9]
+    });
+    var plotNum  = document.getElementById('recPlot').value;
+    var ownerName = document.getElementById('recOwner').value;
+    L.marker([lat, lng], { icon: icon })
+      .addTo(map)
+      .bindPopup('<strong>' + plotNum + '</strong><br>' + ownerName)
+      .openPopup();
+  })();
+<\/script>`;
+%>
+<%- include('../partials/header') %>
+
+<!-- Hidden inputs to pass server data to JS without inline EJS-in-JS -->
+<input type="hidden" id="recLat"   value="<%= record.lat %>">
+<input type="hidden" id="recLng"   value="<%= record.lng %>">
+<input type="hidden" id="recPlot"  value="<%= record.plot_number %>">
+<input type="hidden" id="recOwner" value="<%= record.owner_name %>">
+
+<div class="page-header">
+  <div class="container-fluid px-4">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+      <div>
+        <h1 class="page-title"><i class="bi bi-file-earmark-text"></i> <%= record.plot_number %></h1>
+        <p class="page-sub">Land Survey Record Detail</p>
+      </div>
+      <div class="d-flex gap-2 flex-wrap">
+        <a href="/records" class="btn btn-outline-light btn-lsm"><i class="bi bi-arrow-left me-1"></i> Back</a>
+        <a href="/records/<%= record._id %>/pdf" class="btn btn-danger btn-lsm"><i class="bi bi-file-earmark-pdf me-1"></i> Export PDF</a>
+        <% if (user.role === 'admin' || user.role === 'survey_officer') { %>
+        <a href="/records/<%= record._id %>/edit" class="btn btn-warning btn-lsm"><i class="bi bi-pencil me-1"></i> Edit</a>
+        <% } %>
+        <% if (user.role === 'admin') { %>
+        <form action="/records/<%= record._id %>/delete" method="POST" class="d-inline"
+              onsubmit="return confirm('Permanently delete this record?')">
+          <button type="submit" class="btn btn-danger btn-lsm"><i class="bi bi-trash3 me-1"></i> Delete</button>
+        </form>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid px-4 py-4">
+  <div class="row g-4">
+
+    <!-- Status Banner -->
+    <div class="col-12">
+      <div class="status-banner status-banner-<%= record.status %>">
+        <span><i class="bi bi-circle-fill"></i> Status: <strong><%= record.status.replace('_',' ').toUpperCase() %></strong></span>
+        <span>Added by: <strong><%= record.created_by_name || 'System' %></strong></span>
+        <span>Created: <strong><%= new Date(record.created_at).toLocaleString('en-IN') %></strong></span>
+        <% if (record.updated_by_name) { %>
+        <span>Last updated: <strong><%= record.updated_by_name %></strong></span>
+        <% } %>
+      </div>
+    </div>
+
+    <!-- Left Column -->
+    <div class="col-lg-8">
+      <div class="row g-4">
+
+        <div class="col-12">
+          <div class="lsm-card">
+            <div class="lsm-card-header"><i class="bi bi-person-fill"></i> Ownership</div>
+            <div class="lsm-card-body">
+              <div class="detail-grid">
+                <div class="detail-item"><span class="detail-label">Owner Name</span><span class="detail-value"><%= record.owner_name %></span></div>
+                <div class="detail-item"><span class="detail-label">Contact</span><span class="detail-value"><%= record.owner_contact || '—' %></span></div>
+                <div class="detail-item"><span class="detail-label">ID / Aadhaar</span><span class="detail-value"><%= record.owner_aadhaar || '—' %></span></div>
+                <div class="detail-item"><span class="detail-label">Plot Number</span><span class="detail-value"><span class="plot-badge"><%= record.plot_number %></span></span></div>
+                <div class="detail-item"><span class="detail-label">Survey Number</span><span class="detail-value"><%= record.survey_number || '—' %></span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12">
+          <div class="lsm-card">
+            <div class="lsm-card-header"><i class="bi bi-tree-fill"></i> Land Details</div>
+            <div class="lsm-card-body">
+              <div class="detail-grid">
+                <div class="detail-item"><span class="detail-label">Area</span><span class="detail-value"><%= record.area %> <%= record.area_unit %></span></div>
+                <div class="detail-item"><span class="detail-label">Land Type</span><span class="detail-value"><span class="type-tag type-<%= record.land_type %>"><%= record.land_type %></span></span></div>
+                <div class="detail-item"><span class="detail-label">Land Use</span><span class="detail-value"><%= record.land_use || '—' %></span></div>
+                <div class="detail-item"><span class="detail-label">Survey Date</span><span class="detail-value"><%= record.survey_date ? new Date(record.survey_date).toLocaleDateString('en-IN') : '—' %></span></div>
+                <div class="detail-item"><span class="detail-label">Registration Date</span><span class="detail-value"><%= record.registration_date ? new Date(record.registration_date).toLocaleDateString('en-IN') : '—' %></span></div>
+              </div>
+              <% if (record.remarks) { %>
+              <div class="mt-3 p-3 remark-box"><strong>Remarks:</strong> <%= record.remarks %></div>
+              <% } %>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12">
+          <div class="lsm-card">
+            <div class="lsm-card-header"><i class="bi bi-geo-alt-fill"></i> Location</div>
+            <div class="lsm-card-body">
+              <div class="detail-grid">
+                <div class="detail-item"><span class="detail-label">Address</span><span class="detail-value"><%= record.address || '—' %></span></div>
+                <div class="detail-item"><span class="detail-label">Village</span><span class="detail-value"><%= record.village || '—' %></span></div>
+                <div class="detail-item"><span class="detail-label">Taluka</span><span class="detail-value"><%= record.taluka || '—' %></span></div>
+                <div class="detail-item"><span class="detail-label">District</span><span class="detail-value"><%= record.district || '—' %></span></div>
+                <div class="detail-item"><span class="detail-label">State</span><span class="detail-value"><%= record.state || '—' %></span></div>
+                <div class="detail-item"><span class="detail-label">Country</span><span class="detail-value"><%= record.country || '—' %></span></div>
+                <div class="detail-item"><span class="detail-label">Pincode</span><span class="detail-value"><%= record.pincode || '—' %></span></div>
+                <div class="detail-item"><span class="detail-label">Latitude</span><span class="detail-value"><%= record.lat %></span></div>
+                <div class="detail-item"><span class="detail-label">Longitude</span><span class="detail-value"><%= record.lng %></span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Files -->
+        <div class="col-12">
+          <div class="lsm-card">
+            <div class="lsm-card-header"><i class="bi bi-paperclip"></i> Attached Documents</div>
+            <div class="lsm-card-body">
+              <h6 class="mb-3 text-muted">Ownership Proofs</h6>
+              <% if (record.ownership_proofs && record.ownership_proofs.length > 0) { %>
+                <div class="file-list">
+                  <% record.ownership_proofs.forEach(function(f){ %>
+                  <a href="/uploads/proofs/<%= f.filename %>" target="_blank" class="file-list-item">
+                    <i class="bi bi-file-earmark-fill"></i>
+                    <span><%= f.original_name %></span>
+                    <small><%= (f.size / 1024).toFixed(1) %> KB</small>
+                  </a>
+                  <% }); %>
+                </div>
+              <% } else { %><p class="text-muted small">No proofs uploaded</p><% } %>
+
+              <h6 class="mt-4 mb-3 text-muted">Survey Images</h6>
+              <% if (record.survey_images && record.survey_images.length > 0) { %>
+                <div class="image-grid">
+                  <% record.survey_images.forEach(function(img){ %>
+                  <a href="/uploads/images/<%= img.filename %>" target="_blank" class="image-thumb">
+                    <img src="/uploads/images/<%= img.filename %>" alt="<%= img.original_name %>" />
+                  </a>
+                  <% }); %>
+                </div>
+              <% } else { %><p class="text-muted small">No images uploaded</p><% } %>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+      <div class="row g-4">
+
+        <!-- Map -->
+        <div class="col-12">
+          <div class="lsm-card">
+            <div class="lsm-card-header"><i class="bi bi-map-fill"></i> Location on Map</div>
+            <div id="recordMap" style="height:280px;border-radius:0 0 12px 12px;"></div>
+          </div>
+        </div>
+
+        <!-- Audit Trail -->
+        <div class="col-12">
+          <div class="lsm-card">
+            <div class="lsm-card-header"><i class="bi bi-clock-history"></i> Audit Trail</div>
+            <div class="lsm-card-body p-0">
+              <div class="audit-trail">
+                <% if (record.audit_trail && record.audit_trail.length > 0) { %>
+                  <% record.audit_trail.slice().reverse().slice(0, 15).forEach(function(a){ %>
+                  <div class="audit-item audit-<%= a.action %>">
+                    <div class="audit-icon">
+                      <i class="bi bi-<%= a.action === 'created' ? 'plus-circle' : a.action === 'updated' ? 'pencil' : a.action === 'deleted' ? 'trash3' : a.action === 'exported' ? 'download' : 'eye' %>"></i>
+                    </div>
+                    <div class="audit-body">
+                      <div class="audit-action"><%= a.action.charAt(0).toUpperCase() + a.action.slice(1) %></div>
+                      <div class="audit-who"><%= a.performed_by_name || 'System' %></div>
+                      <div class="audit-when"><%= new Date(a.timestamp).toLocaleString('en-IN') %></div>
+                      <% if (a.changes && Object.keys(a.changes).length > 0) { %>
+                        <div class="audit-changes">
+                          <% Object.entries(a.changes).forEach(function(entry){ %>
+                            <span class="change-tag"><%= entry[0] %>: <%= entry[1].from %> -> <%= entry[1].to %></span>
+                          <% }); %>
+                        </div>
+                      <% } %>
+                    </div>
+                  </div>
+                  <% }); %>
+                <% } else { %>
+                  <p class="text-muted text-center py-4 small">No audit history</p>
+                <% } %>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

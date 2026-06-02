@@ -1,0 +1,175 @@
+<%- include('../partials/header') %>
+
+<div class="page-header">
+  <div class="container-fluid px-4">
+    <div class="d-flex justify-content-between align-items-center">
+      <div>
+        <h1 class="page-title"><i class="bi bi-table"></i> Land Records</h1>
+        <p class="page-sub"><%= total %> total records found</p>
+      </div>
+      <% if (user.role === 'admin' || user.role === 'survey_officer') { %>
+      <a href="/records/add" class="btn btn-success btn-lsm"><i class="bi bi-plus-circle me-1"></i> Add Record</a>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid px-4 py-4">
+
+  <!-- Search Panel -->
+  <div class="lsm-card mb-4">
+    <div class="lsm-card-header d-flex justify-content-between align-items-center" style="cursor:pointer" data-bs-toggle="collapse" data-bs-target="#searchPanel">
+      <span><i class="bi bi-funnel-fill"></i> Search & Filter</span>
+      <i class="bi bi-chevron-down"></i>
+    </div>
+    <div class="collapse <%= Object.keys(query).length > 0 ? 'show' : '' %>" id="searchPanel">
+      <div class="lsm-card-body">
+        <form action="/records" method="GET" id="searchForm">
+          <div class="row g-3">
+            <div class="col-md-3">
+              <label class="form-label">Plot Number</label>
+              <input type="text" name="plot_number" class="form-control fc-custom" value="<%= query.plot_number || '' %>" placeholder="e.g. PLT-001" />
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Survey Number</label>
+              <input type="text" name="survey_number" class="form-control fc-custom" value="<%= query.survey_number || '' %>" />
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Owner Name</label>
+              <input type="text" name="owner_name" class="form-control fc-custom" value="<%= query.owner_name || '' %>" />
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">State</label>
+              <input type="text" name="state" class="form-control fc-custom" value="<%= query.state || '' %>" />
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">District</label>
+              <input type="text" name="district" class="form-control fc-custom" value="<%= query.district || '' %>" />
+            </div>
+            <div class="col-md-2">
+              <label class="form-label">Land Type</label>
+              <select name="land_type" class="form-select fc-custom">
+                <option value="">All Types</option>
+                <% ['agricultural','residential','commercial','industrial','forest','waste','other'].forEach(t => { %>
+                  <option value="<%= t %>" <%= query.land_type === t ? 'selected' : '' %>><%= t.charAt(0).toUpperCase() + t.slice(1) %></option>
+                <% }) %>
+              </select>
+            </div>
+            <div class="col-md-2">
+              <label class="form-label">Status</label>
+              <select name="status" class="form-select fc-custom">
+                <option value="">All Status</option>
+                <% ['active','disputed','under_review','transferred','archived'].forEach(s => { %>
+                  <option value="<%= s %>" <%= query.status === s ? 'selected' : '' %>><%= s.replace('_',' ') %></option>
+                <% }) %>
+              </select>
+            </div>
+            <div class="col-md-2">
+              <label class="form-label">Date From</label>
+              <input type="date" name="date_from" class="form-control fc-custom" value="<%= query.date_from || '' %>" />
+            </div>
+            <div class="col-md-2">
+              <label class="form-label">Date To</label>
+              <input type="date" name="date_to" class="form-control fc-custom" value="<%= query.date_to || '' %>" />
+            </div>
+            <div class="col-md-1">
+              <label class="form-label">Per Page</label>
+              <select name="limit" class="form-select fc-custom">
+                <% [10, 25, 50].forEach(n => { %>
+                  <option value="<%= n %>" <%= limit == n ? 'selected' : '' %>><%= n %></option>
+                <% }) %>
+              </select>
+            </div>
+            <div class="col-md-1 d-flex align-items-end gap-2">
+              <button type="submit" class="btn btn-success btn-lsm"><i class="bi bi-search"></i></button>
+              <a href="/records" class="btn btn-outline-secondary btn-lsm"><i class="bi bi-x"></i></a>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="lsm-card">
+    <div class="lsm-card-body p-0">
+      <div class="table-responsive">
+        <table class="table lsm-table mb-0">
+          <thead>
+            <tr>
+              <th><a href="?<%= new URLSearchParams({...query, sort:'plot_number', order: sortOrder==='asc'?'desc':'asc'}).toString() %>">Plot No. <i class="bi bi-arrow-down-up"></i></a></th>
+              <th>Survey No.</th>
+              <th><a href="?<%= new URLSearchParams({...query, sort:'owner_name', order: sortOrder==='asc'?'desc':'asc'}).toString() %>">Owner <i class="bi bi-arrow-down-up"></i></a></th>
+              <th>Area</th>
+              <th>Type</th>
+              <th><a href="?<%= new URLSearchParams({...query, sort:'state', order: sortOrder==='asc'?'desc':'asc'}).toString() %>">State <i class="bi bi-arrow-down-up"></i></a></th>
+              <th>District</th>
+              <th>Status</th>
+              <th><a href="?<%= new URLSearchParams({...query, sort:'survey_date', order: sortOrder==='asc'?'desc':'asc'}).toString() %>">Date <i class="bi bi-arrow-down-up"></i></a></th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (records && records.length > 0) { %>
+              <% records.forEach(r => { %>
+              <tr>
+                <td><span class="plot-badge"><%= r.plot_number %></span></td>
+                <td><%= r.survey_number || '—' %></td>
+                <td><%= r.owner_name %></td>
+                <td><%= r.area %> <small class="text-muted"><%= r.area_unit %></small></td>
+                <td><span class="type-tag type-<%= r.land_type %>"><%= r.land_type %></span></td>
+                <td><%= r.state || '—' %></td>
+                <td><%= r.district || '—' %></td>
+                <td><span class="status-pill status-<%= r.status %>"><%= r.status %></span></td>
+                <td><small><%= r.survey_date ? new Date(r.survey_date).toLocaleDateString('en-IN') : '—' %></small></td>
+                <td>
+                  <div class="action-btns">
+                    <a href="/records/<%= r._id %>" class="btn-icon" title="View"><i class="bi bi-eye"></i></a>
+                    <% if (user.role === 'admin' || user.role === 'survey_officer') { %>
+                    <a href="/records/<%= r._id %>/edit" class="btn-icon btn-icon-edit" title="Edit"><i class="bi bi-pencil"></i></a>
+                    <% } %>
+                    <a href="/records/<%= r._id %>/pdf" class="btn-icon btn-icon-pdf" title="Export PDF"><i class="bi bi-file-earmark-pdf"></i></a>
+                    <% if (user.role === 'admin') { %>
+                    <form action="/records/<%= r._id %>/delete" method="POST" class="d-inline" onsubmit="return confirm('Delete record <%= r.plot_number %>?')">
+                      <button type="submit" class="btn-icon btn-icon-del" title="Delete"><i class="bi bi-trash3"></i></button>
+                    </form>
+                    <% } %>
+                  </div>
+                </td>
+              </tr>
+              <% }) %>
+            <% } else { %>
+            <tr><td colspan="10" class="text-center py-5 text-muted">No records match your search criteria.</td></tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <% if (totalPages > 1) { %>
+    <div class="lsm-card-footer">
+      <div class="d-flex justify-content-between align-items-center">
+        <small class="text-muted">Showing page <%= page %> of <%= totalPages %> (<%= total %> records)</small>
+        <nav>
+          <ul class="pagination pagination-sm mb-0">
+            <li class="page-item <%= page <= 1 ? 'disabled' : '' %>">
+              <a class="page-link" href="?<%= new URLSearchParams({...query, page: page - 1, limit}).toString() %>">Prev</a>
+            </li>
+            <% for(let p = Math.max(1, page-2); p <= Math.min(totalPages, page+2); p++) { %>
+            <li class="page-item <%= p === page ? 'active' : '' %>">
+              <a class="page-link" href="?<%= new URLSearchParams({...query, page: p, limit}).toString() %>"><%= p %></a>
+            </li>
+            <% } %>
+            <li class="page-item <%= page >= totalPages ? 'disabled' : '' %>">
+              <a class="page-link" href="?<%= new URLSearchParams({...query, page: page + 1, limit}).toString() %>">Next</a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+    <% } %>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

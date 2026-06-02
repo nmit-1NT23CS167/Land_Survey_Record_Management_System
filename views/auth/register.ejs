@@ -1,0 +1,73 @@
+<%- include('../partials/header') %>
+
+<div class="auth-wrapper">
+  <div class="auth-left">
+    <div class="auth-overlay">
+      <div class="auth-brand">
+        <i class="bi bi-map-fill"></i>
+        <h1>LandSurveyPro</h1>
+        <p>Intelligent Land Survey Record Management</p>
+      </div>
+      <div class="auth-features">
+        <div class="feature-item"><i class="bi bi-person-check"></i> Instant account creation</div>
+        <div class="feature-item"><i class="bi bi-layers"></i> Role-based access control</div>
+        <div class="feature-item"><i class="bi bi-database-check"></i> MongoDB Atlas backed</div>
+        <div class="feature-item"><i class="bi bi-cloud-upload"></i> File upload support</div>
+      </div>
+    </div>
+  </div>
+  <div class="auth-right">
+    <div class="auth-card">
+      <h2 class="auth-title">Create Account</h2>
+      <p class="auth-sub">Register for system access</p>
+
+      <form action="/register" method="POST" novalidate>
+        <div class="row">
+          <div class="col-12 mb-3">
+            <label class="form-label">Full Name</label>
+            <div class="input-group-custom">
+              <i class="bi bi-person"></i>
+              <input type="text" name="full_name" class="form-control fc-custom" placeholder="Rajesh Kumar" required />
+            </div>
+          </div>
+          <div class="col-12 mb-3">
+            <label class="form-label">Email Address</label>
+            <div class="input-group-custom">
+              <i class="bi bi-envelope"></i>
+              <input type="email" name="email" class="form-control fc-custom" placeholder="officer@survey.gov.in" required />
+            </div>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Phone</label>
+            <div class="input-group-custom">
+              <i class="bi bi-phone"></i>
+              <input type="text" name="phone" class="form-control fc-custom" placeholder="+91 9876543210" />
+            </div>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Department</label>
+            <div class="input-group-custom">
+              <i class="bi bi-building"></i>
+              <input type="text" name="department" class="form-control fc-custom" placeholder="Revenue Dept." />
+            </div>
+          </div>
+          <div class="col-12 mb-4">
+            <label class="form-label">Password</label>
+            <div class="input-group-custom">
+              <i class="bi bi-lock"></i>
+              <input type="password" name="password" class="form-control fc-custom" placeholder="Min. 6 characters" required />
+            </div>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary w-100 btn-lsm">
+          <i class="bi bi-person-plus me-2"></i>Register
+        </button>
+      </form>
+
+      <div class="auth-divider"><span>Already registered?</span></div>
+      <a href="/login" class="btn btn-outline-secondary w-100 btn-lsm-outline">Sign In</a>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

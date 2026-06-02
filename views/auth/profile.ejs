@@ -1,0 +1,74 @@
+<%- include('../partials/header') %>
+
+<div class="page-header">
+  <div class="container-fluid px-4">
+    <h1 class="page-title"><i class="bi bi-person-circle"></i> My Profile</h1>
+    <p class="page-sub">Account information</p>
+  </div>
+</div>
+
+<div class="container-fluid px-4 py-4">
+  <% if (!profileUser) { %>
+    <div class="alert alert-danger">Unable to load profile. Please <a href="/logout">log out</a> and log in again.</div>
+  <% } else { %>
+  <div class="row justify-content-center">
+    <div class="col-lg-5">
+      <div class="lsm-card">
+
+        <div class="lsm-card-body text-center py-5">
+          <div class="profile-avatar">
+            <%= profileUser.full_name ? profileUser.full_name.charAt(0).toUpperCase() : '?' %>
+          </div>
+          <h3 class="mt-3 mb-1"><%= profileUser.full_name %></h3>
+          <p class="mb-2" style="color:var(--text-muted)"><%= profileUser.email %></p>
+          <span class="role-badge role-<%= profileUser.role %>">
+            <%= profileUser.role.replace('_', ' ') %>
+          </span>
+        </div>
+
+        <div class="lsm-card-body" style="border-top:1px solid var(--border)">
+          <div class="detail-grid">
+            <div class="detail-item">
+              <span class="detail-label">Department</span>
+              <span class="detail-value"><%= profileUser.department || '—' %></span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Phone</span>
+              <span class="detail-value"><%= profileUser.phone || '—' %></span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Account Status</span>
+              <span class="detail-value">
+                <span class="status-pill <%= profileUser.is_active ? 'status-active' : 'status-archived' %>">
+                  <%= profileUser.is_active ? 'Active' : 'Inactive' %>
+                </span>
+              </span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Last Login</span>
+              <span class="detail-value">
+                <%= profileUser.last_login ? new Date(profileUser.last_login).toLocaleString('en-IN') : 'N/A' %>
+              </span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Member Since</span>
+              <span class="detail-value">
+                <%= new Date(profileUser.created_at).toLocaleDateString('en-IN') %>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="lsm-card-footer text-center">
+          <a href="/records/dashboard" class="btn btn-sm btn-outline-secondary btn-lsm">
+            <i class="bi bi-speedometer2 me-1"></i> Back to Dashboard
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  <% } %>
+</div>
+
+<%- include('../partials/footer') %>

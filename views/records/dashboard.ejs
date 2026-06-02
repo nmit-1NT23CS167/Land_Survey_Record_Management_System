@@ -1,0 +1,136 @@
+<%- include('../partials/header') %>
+
+<div class="page-header">
+  <div class="container-fluid px-4">
+    <div class="d-flex justify-content-between align-items-center">
+      <div>
+        <h1 class="page-title"><i class="bi bi-speedometer2"></i> Dashboard</h1>
+        <p class="page-sub">Overview of land records and activity</p>
+      </div>
+      <% if (user && (user.role === 'admin' || user.role === 'survey_officer')) { %>
+      <a href="/records/add" class="btn btn-success btn-lsm">
+        <i class="bi bi-plus-circle me-1"></i> Add Record
+      </a>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid px-4 py-4">
+  <div class="row g-4 mb-4">
+    <div class="col-md-3">
+      <div class="stat-card stat-total">
+        <div class="stat-icon"><i class="bi bi-archive-fill"></i></div>
+        <div class="stat-body">
+          <div class="stat-num"><%= stats.total || 0 %></div>
+          <div class="stat-label">Total Records</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="stat-card stat-active">
+        <div class="stat-icon"><i class="bi bi-check-circle-fill"></i></div>
+        <div class="stat-body">
+          <div class="stat-num"><%= stats.active || 0 %></div>
+          <div class="stat-label">Active Records</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="stat-card stat-review">
+        <div class="stat-icon"><i class="bi bi-exclamation-circle-fill"></i></div>
+        <div class="stat-body">
+          <div class="stat-num"><%= stats.disputed || 0 %></div>
+          <div class="stat-label">Disputed Records</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="stat-card stat-review">
+        <div class="stat-icon"><i class="bi bi-clock-history"></i></div>
+        <div class="stat-body">
+          <div class="stat-num"><%= stats.under_review || 0 %></div>
+          <div class="stat-label">Under Review</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-lg-4">
+      <div class="lsm-card h-100">
+        <div class="lsm-card-header"><i class="bi bi-bar-chart-fill"></i> Records by State</div>
+        <div class="lsm-card-body">
+          <% if (byState && byState.length > 0) { %>
+            <% byState.forEach(function(item) { %>
+            <div class="type-bar-row">
+              <span class="type-label"><%= item._id || 'Unknown' %></span>
+              <div class="type-bar-track">
+                <div class="type-bar-fill" style="width:<%= stats.total > 0 ? Math.round((item.count / stats.total) * 100) : 0 %>%"></div>
+              </div>
+              <span class="type-count"><%= item.count %></span>
+            </div>
+            <% }); %>
+          <% } else { %>
+            <p class="text-muted mb-0">No state data available.</p>
+          <% } %>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <div class="lsm-card h-100">
+        <div class="lsm-card-header"><i class="bi bi-grid-3x3-gap-fill"></i> Records by Type</div>
+        <div class="lsm-card-body">
+          <% if (byType && byType.length > 0) { %>
+            <% byType.forEach(function(item) { %>
+            <div class="type-bar-row">
+              <span class="type-label"><%= item._id || 'Unknown' %></span>
+              <div class="type-bar-track">
+                <div class="type-bar-fill" style="width:<%= stats.total > 0 ? Math.round((item.count / stats.total) * 100) : 0 %>%"></div>
+              </div>
+              <span class="type-count"><%= item.count %></span>
+            </div>
+            <% }); %>
+          <% } else { %>
+            <p class="text-muted mb-0">No land type data available.</p>
+          <% } %>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <div class="lsm-card h-100">
+        <div class="lsm-card-header"><i class="bi bi-clock-history"></i> Recent Records</div>
+        <div class="lsm-card-body p-0">
+          <div class="table-responsive">
+            <table class="table lsm-table mb-0">
+              <thead>
+                <tr>
+                  <th>Plot No.</th>
+                  <th>Owner</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% if (recent && recent.length > 0) { %>
+                  <% recent.forEach(function(record) { %>
+                    <tr>
+                      <td><strong><a href="/records/<%= record._id %>"><%= record.plot_number %></a></strong></td>
+                      <td><%= record.owner_name %></td>
+                      <td><span class="status-pill <%= record.status === 'active' ? 'status-active' : 'status-archived' %>"><%= record.status.replace('_', ' ') %></span></td>
+                    </tr>
+                  <% }); %>
+                <% } else { %>
+                  <tr><td colspan="3" class="text-center py-4 text-muted">No recent records found.</td></tr>
+                <% } %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,12 @@
+<%- include('partials/header') %>
+<div class="container py-5 text-center">
+  <div class="error-page">
+    <div class="error-code"><%= typeof status !== 'undefined' ? status : 500 %></div>
+    <h2>Something Went Wrong</h2>
+    <p style="color:var(--text-muted)"><%= typeof message !== 'undefined' ? message : 'An unexpected error occurred.' %></p>
+    <a href="/records/dashboard" class="btn btn-success btn-lsm mt-3">
+      <i class="bi bi-house me-2"></i>Return to Dashboard
+    </a>
+  </div>
+</div>
+<%- include('partials/footer') %>

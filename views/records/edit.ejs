@@ -1,0 +1,187 @@
+<%- include('../partials/header') %>
+
+<div class="page-header">
+  <div class="container-fluid px-4">
+    <div class="d-flex justify-content-between align-items-center">
+      <div>
+        <h1 class="page-title"><i class="bi bi-pencil-fill"></i> Edit Record</h1>
+        <p class="page-sub">Updating: <%= record.plot_number %></p>
+      </div>
+      <a href="/records/<%= record._id %>" class="btn btn-outline-light btn-lsm"><i class="bi bi-arrow-left me-1"></i> Cancel</a>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid px-4 py-4">
+  <form action="/records/<%= record._id %>/edit" method="POST" enctype="multipart/form-data" novalidate>
+    <div class="row g-4">
+
+      <div class="col-lg-6">
+        <div class="lsm-card h-100">
+          <div class="lsm-card-header"><i class="bi bi-card-text"></i> Identification</div>
+          <div class="lsm-card-body">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">Plot Number</label>
+                <input type="text" class="form-control fc-custom" value="<%= record.plot_number %>" disabled />
+                <small class="text-muted">Plot number cannot be changed</small>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Survey Number</label>
+                <input type="text" name="survey_number" class="form-control fc-custom" value="<%= record.survey_number || '' %>" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-6">
+        <div class="lsm-card h-100">
+          <div class="lsm-card-header"><i class="bi bi-person-fill"></i> Ownership</div>
+          <div class="lsm-card-body">
+            <div class="row g-3">
+              <div class="col-12">
+                <label class="form-label required">Owner Name</label>
+                <input type="text" name="owner_name" class="form-control fc-custom" value="<%= record.owner_name %>" required />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Contact</label>
+                <input type="text" name="owner_contact" class="form-control fc-custom" value="<%= record.owner_contact || '' %>" />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Aadhaar / ID</label>
+                <input type="text" name="owner_aadhaar" class="form-control fc-custom" value="<%= record.owner_aadhaar || '' %>" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-6">
+        <div class="lsm-card h-100">
+          <div class="lsm-card-header"><i class="bi bi-tree-fill"></i> Land Details</div>
+          <div class="lsm-card-body">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">Area</label>
+                <input type="text" name="area" class="form-control fc-custom" value="<%= record.area %>" />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Unit</label>
+                <select name="area_unit" class="form-select fc-custom">
+                  <% ['acres','hectares','sq_meters','sq_feet','guntha'].forEach(u => { %>
+                    <option value="<%= u %>" <%= record.area_unit === u ? 'selected' : '' %>><%= u.replace('_',' ') %></option>
+                  <% }) %>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Land Type</label>
+                <select name="land_type" class="form-select fc-custom">
+                  <% ['agricultural','residential','commercial','industrial','forest','waste','other'].forEach(t => { %>
+                    <option value="<%= t %>" <%= record.land_type === t ? 'selected' : '' %>><%= t.charAt(0).toUpperCase() + t.slice(1) %></option>
+                  <% }) %>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Status</label>
+                <select name="status" class="form-select fc-custom">
+                  <% ['active','disputed','under_review','transferred','archived'].forEach(s => { %>
+                    <option value="<%= s %>" <%= record.status === s ? 'selected' : '' %>><%= s.replace('_',' ') %></option>
+                  <% }) %>
+                </select>
+              </div>
+              <div class="col-12">
+                <label class="form-label">Remarks</label>
+                <textarea name="remarks" class="form-control fc-custom" rows="3"><%= record.remarks || '' %></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-6">
+        <div class="lsm-card h-100">
+          <div class="lsm-card-header"><i class="bi bi-geo-alt-fill"></i> Location</div>
+          <div class="lsm-card-body">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">Latitude</label>
+                <input type="text" name="lat" class="form-control fc-custom" value="<%= record.lat %>" />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Longitude</label>
+                <input type="text" name="lng" class="form-control fc-custom" value="<%= record.lng %>" />
+              </div>
+              <div class="col-12">
+                <label class="form-label">Address</label>
+                <input type="text" name="address" class="form-control fc-custom" value="<%= record.address || '' %>" />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Village</label>
+                <input type="text" name="village" class="form-control fc-custom" value="<%= record.village || '' %>" />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Taluka</label>
+                <input type="text" name="taluka" class="form-control fc-custom" value="<%= record.taluka || '' %>" />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">District</label>
+                <input type="text" name="district" class="form-control fc-custom" value="<%= record.district || '' %>" />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">State</label>
+                <input type="text" name="state" class="form-control fc-custom" value="<%= record.state || '' %>" />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Country</label>
+                <input type="text" name="country" class="form-control fc-custom" value="<%= record.country || '' %>" />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Pincode</label>
+                <input type="text" name="pincode" class="form-control fc-custom" value="<%= record.pincode || '' %>" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12">
+        <div class="lsm-card">
+          <div class="lsm-card-header"><i class="bi bi-cloud-upload-fill"></i> Add More Documents</div>
+          <div class="lsm-card-body">
+            <div class="row g-4">
+              <div class="col-md-6">
+                <label class="form-label">Additional Ownership Proofs</label>
+                <div class="file-drop-zone">
+                  <i class="bi bi-file-earmark-arrow-up"></i>
+                  <span>Drag & drop or click to select</span>
+                  <input type="file" name="ownership_proofs" multiple accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" class="file-input" />
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Additional Survey Images</label>
+                <div class="file-drop-zone">
+                  <i class="bi bi-image"></i>
+                  <span>Drag & drop or click to select</span>
+                  <input type="file" name="survey_images" multiple accept=".jpg,.jpeg,.png,.gif" class="file-input" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12">
+        <div class="d-flex gap-3 justify-content-end">
+          <a href="/records/<%= record._id %>" class="btn btn-outline-secondary btn-lsm">Cancel</a>
+          <button type="submit" class="btn btn-warning btn-lsm px-5">
+            <i class="bi bi-save me-2"></i>Save Changes
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </form>
+</div>
+
+<%- include('../partials/footer') %>
