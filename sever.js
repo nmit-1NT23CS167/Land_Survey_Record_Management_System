@@ -1,7 +1,3 @@
-//str = "mongodb+srv://myAtlasDBUser:pgnsgv27@myatlasclusteredu.23kpdhw.mongodb.net/"
-
-
-//mongodb+srv://prajwalgnaik27:pgnsgv27@cluster0.wtmjs5q.mongodb.net/
 
 // server.js
 const express = require('express');
@@ -13,7 +9,7 @@ const app = express();
 const PORT = 5500;
 
 // MongoDB connection
-mongoose.connect("mongodb+srv://myAtlasDBUser:pgnsgv27@myatlasclusteredu.23kpdhw.mongodb.net/", {
+mongoose.connect("connection string/", {
     useNewUrlParser: true,
     useUnifiedTopology: true
 }).then(() => console.log("MongoDB connected"))
