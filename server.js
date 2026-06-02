@@ -93,7 +93,7 @@ app.use((err, req, res, next) => {
 });
 
 // ─── Database & Server Start ──────────────────────────────────────────────────
-const dbUri = process.env.MONGODB_URI || process.env.MONGO_URI || 'mongodb://localhost:27017/land_survey_db';
+const dbUri = process.env.MONGODB_URI || process.env.MONGO_URI || 'uri';
 const dbOptions = {
   serverSelectionTimeoutMS: 10000,
   connectTimeoutMS: 10000,
